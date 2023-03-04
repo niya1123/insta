@@ -1,10 +1,8 @@
 import os
-import random
-import string
 import time
 from datetime import datetime
 
-import pandas as pd
+from operate_csv import generate_user_data
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.action_chains import ActionChains
@@ -15,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 
 def error_screen():
     screenShotFileName = '{}errorImage.png'.format(datetime.now().strftime("%Y%m%d_%H%M%S"))
@@ -40,71 +39,37 @@ def waitElement(elementLocator, seconds):
 	time.sleep(seconds)
 	return element
 
-def generate_random_string(n, used_strings):
-    while True:
-        random_string = ''.join(random.choices(string.ascii_letters, k=n))
-        if random_string not in used_strings:
-            used_strings.append(random_string)
-            return random_string
-        
-def generate_user_data():
-      # 生成したlastname, firstname, username, passwordを格納するリスト
-    lastnames = []
-    firstnames = []
-    usernames = []
-    passwords = []
-   
-    # csvファイルの読み込み
-    df = pd.read_csv('userdata.csv')
-    for i in range(len(df)):
-        used_lastnames = list(df['lastname'])
-        used_firstnames = list(df['firstname'])
-        used_usernames = list(df['username'])
-        used_passwords = list(df['password'])
-        
-        lastnames.append(generate_random_string(8, used_lastnames))
-        firstnames.append(generate_random_string(8, used_firstnames))
-        usernames.append(generate_random_string(8, used_usernames)+''.join(random.choice(string.digits) if j == 2 else random.choice(string.ascii_letters) for j in range(8)))
-        while True:
-            password = generate_random_string(random.randint(8, 12), used_passwords)
-            if len(password) >= 8 and len(password) <= 12:
-                break
-        passwords.append(password)
-    
-    # 生成したランダムな文字列をデータフレームに追加してcsvファイルに保存
-    new_df = pd.DataFrame({'lastname': lastnames, 'firstname': firstnames, 'username': usernames, 'password': passwords})
-    df = pd.concat([df, new_df], ignore_index=True)
-    df.to_csv('userdata.csv', index=False)
-
 def sign_up():
-    lastnames = []
-    firstnames = []
-    usernames = []
-    passwords = []
-   
-    # csvファイルの読み込み
-    df = pd.read_csv('userdata.csv')
-    for i in range(len(df)):
-        lastnames = list(df['lastname'])
-        firstnames = list(df['firstname'])
-        usernames = list(df['username'])
-        passwords = list(df['password'])
+    email, fullname, username, password= generate_user_data()
+    try:
+        # 名前等の入力画面
+        driver.get('https://www.instagram.com/accounts/emailsignup/')
+        elementEmailOrPhoneTextBox = waitElement((By.NAME, 'emailOrPhone'), 3)
+        elementEmailOrPhoneTextBox.send_keys(email)
+        elementFullNameTextBox = waitElement((By.NAME, 'fullName'), 3)
+        elementFullNameTextBox.send_keys(fullname)
+        elementUserNameTextBox = waitElement((By.NAME, 'username'), 3)
+        elementUserNameTextBox.send_keys(username)
+        elementPassWordTextBox = waitElement((By.NAME, 'password'), 3)
+        elementPassWordTextBox.send_keys(password)
+        nextButtonXpath = '/html/body/div[2]/div/div/div[1]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div[7]/div/button'
+        elementNextButton = waitElementClickable((By.XPATH, nextButtonXpath), 3)
+        elementNextButton.click()
+        wait.until(EC.presence_of_all_elements_located)
 
-    driver.get('https://www.instagram.com/accounts/emailsignup/')
-    elementLastNameTextBox = waitElement((By.NAME, 'fullName'), 3)
-    elementLastNameTextBox.send_keys(lastnames[-1])
-    userNameXpath = '/html/body/div[1]/div[1]/div[2]/div[1]/div[2]/div/div/div[2]/div/div[1]/div/form/span/section/div/div/div[2]/div[1]/div/div[1]/div/div[1]/input'
-    elementUserNameTextBox = waitElement((By.NAME, 'Username'), 3)
-    driver.find_element_by_xpath(userNameXpath).clear()
-    elementUserNameTextBox.send_keys(usernames[-1])
-    elementPassWordTextBox = waitElement((By.NAME, 'Passwd'), 3)
-    elementPassWordTextBox.send_keys(passwords[-1])
-    elementConfirmPassWordTextBox = waitElement((By.NAME, 'ConfirmPasswd'), 3)
-    elementConfirmPassWordTextBox.send_keys(passwords[-1])
-    nextButtonXpath = '/html/body/div[1]/div[1]/div[2]/div[1]/div[2]/div/div/div[2]/div/div[2]/div/div[1]/div/div/button'
-    elementNextButton = waitElementClickable((By.XPATH, nextButtonXpath), 3)
-    elementNextButton.click()
-    wait.until(EC.presence_of_all_elements_located)
+        # 生年月日入力画面
+        yearXpath = '/html/body/div[2]/div/div/div[1]/div/div/div/div[1]/section/main/div/div/div[1]/div/div[4]/div/div/span/span[3]/select'
+        elementYear =  waitElementClickable((By.XPATH, yearXpath), 3)
+        yearSelect = Select(elementYear)
+        yearSelect.select_by_visible_text("1999")
+        nextButtonXpath = '/html/body/div[2]/div/div/div[1]/div/div/div/div[1]/section/main/div/div/div[1]/div/div[6]'
+        elementNextButton = waitElementClickable((By.XPATH, nextButtonXpath), 3)
+        elementNextButton.click()
+        wait.until(EC.presence_of_all_elements_located)
+    except Exception as e:
+        print(e)
+        error_screen()
+        print('アカウントは作成されませんでした')
 
 try:
     chrome_options = webdriver.ChromeOptions()
@@ -116,10 +81,7 @@ try:
     desired_capabilities=DesiredCapabilities.CHROME,
     options=chrome_options)
     wait = WebDriverWait(driver=driver, timeout=180)
-    generate_user_data()
     sign_up()
-    time.sleep(9)
-    clip()
     driver.close()
     driver.quit()
 
@@ -129,5 +91,6 @@ except Exception as e:
     driver.quit()
 
 finally:
+    clip()
     driver.close()
     driver.quit()
