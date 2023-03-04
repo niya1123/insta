@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+
+    tor-proxy:
+      image: dperson/torproxy
+      container_name: tor-proxy
+      ports:
+        - "8118:8118"
+        - "9050:9050"
+
+    selenium-hub:
+        image: selenium/hub:3.141.59
+        container_name: selenium-hub
+        ports:
+          - "4444:4444"
+
+    chrome:
+        image: selenium/node-chrome-debug:3.141.59
+        depends_on:
+          - selenium-hub
+        environment:
+          - NODE_MAX_INSTANCES=5
+          - NODE_MAX_SESSION=5
+          - no_proxy=localhost
+          - HUB_ENV_no_proxy=localhost
+          - HUB_PORT_4444_TCP_ADDR=selenium-hub 
+          - HUB_PORT_4444_TCP_PORT=4444
+          - SCREEN_WIDTH=1440
+          - SCREEN_HEIGHT=900
+
+    python:
+        build: .
+        container_name: python_ins
+        volumes: 
+            - .:/workspace
+        command: /bin/bash
+        ports:
+          - "41383:41383"
+        tty: true
+        stdin_open: true
