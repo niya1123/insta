@@ -8,7 +8,7 @@ RUN pip install \
     beautifulsoup4 \
     google-api-python-client google-auth-httplib2 google-auth-oauthlib \
     pandas PySocks
-
+    
 ENV LANG=ja_JP.UTF-8 \
     LANGUAGE=ja_JP:ja \
     LC_ALL=ja_JP.UTF-8
