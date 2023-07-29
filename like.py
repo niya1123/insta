@@ -14,7 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 def error_screen():
     screenShotFileName = '{}errorImage.png'.format(datetime.now().strftime("%Y%m%d_%H%M%S"))
-    screenShotFloderPath = os.path.dirname(os.path.abspath(__file__))
+    screenShotFloderPath = os.path.dirname(os.path.abspath(__file__)) + '/insta_error'
     screenShotFullPath = os.path.join(screenShotFloderPath, screenShotFileName)
     driver.save_screenshot(screenShotFullPath)
 
@@ -32,7 +32,7 @@ def waitElement(elementLocator, seconds):
 
 def clip():
     screenShotFileName = '{}clipImage.png'.format(datetime.now().strftime("%Y%m%d_%H%M%S"))
-    screenShotFloderPath = os.path.dirname(os.path.abspath(__file__))
+    screenShotFloderPath = os.path.dirname(os.path.abspath(__file__)) + '/insta_clip'
     screenShotFullPath = os.path.join(screenShotFloderPath, screenShotFileName)
     driver.save_screenshot(screenShotFullPath)
 
@@ -40,33 +40,32 @@ def login():
     driver.get('https://www.instagram.com')
     userNameTextBoxName = 'username'
     passTextBoxName = 'password'
-    elementUserNameTextBox = waitElement((By.NAME, userNameTextBoxName), 10)
-    elementUserNameTextBox.send_keys('klrqkcgngm')
-    time.sleep(1)
-    driver.find_element_by_name(passTextBoxName).send_keys('yayaya#1234')
-    time.sleep(1)
+    elementUserNameTextBox = waitElement((By.NAME, userNameTextBoxName), 5)
+    elementUserNameTextBox.send_keys('takesiins')
+    driver.find_element_by_name(passTextBoxName).send_keys('Insta#1234')
     loginButton = driver.find_element_by_css_selector("button[type=submit]")
     loginButton.click()
-    time.sleep(random.randint(2, 3))
-    laterButtonXpath = '/html/body/div[1]/div/div/div/div[1]/div/div/div/div[1]/section/main/div/div/div/div/button'
-    elementLaterButton = waitElementClickable((By.XPATH, laterButtonXpath), 5)
-    elementLaterButton.click()
-    time.sleep(random.randint(2, 3))
-    logging.info('Clicked later')
+    logging.info('ログインしました')
+    loginSaveButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div/div/section/div/button'
+    elementLoginSaveButton = waitElementClickable((By.XPATH, loginSaveButtonXpath), 5)
+    if(elementLoginSaveButton):
+        elementLoginSaveButton.click()
+        logging.info('ログイン情報を保存しました')
 
-def like(url):
-    driver.get(url)
-    likeButtonXpath = '/html/body/div[1]/div/div/div/div[1]/div/div/div/div[1]/section/main/div[1]/div[1]/article/div/div[2]/div/div[2]/section[1]/span[1]/button'
-    elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 2)
-    elementLikeButton.click()
-    logging.info('like clicked')
+# def like(url):
+#     driver.get(url)
+#     logging.info('投稿を読み込んでいます')
+#     likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]/div/div/span/svg'
+#     elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 2)
+#     elementLikeButton.click()
+#     logging.info(url+'をいいねしました！')
 
 try:
     logging.config.fileConfig('logging.conf')
     logger = logging.getLogger()
 
-    logging.info('Start!!!')
-    logging.info('Now login...')
+    logging.info('プログラムを実行しました')
+    logging.info('ただいまログイン中です')
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
@@ -75,22 +74,28 @@ try:
     driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
     desired_capabilities=DesiredCapabilities.CHROME,
     options=chrome_options)
-    time.sleep(3)
     login()
-    logging.info('Done Login')
+    logging.info('ログインが完了しました')
 
     with open('./url.csv') as f:
         for url in f:
-            time.sleep(random.randint(2, 3))
-
-            like(url)
-            time.sleep(random.randint(2, 3))
+            driver.get(url)
+            logging.info('投稿を読み込んでいます')
+            likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]/div/div/span/svg'
+            elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 2)
+            if(elementLikeButton):
+                elementLikeButton.click()
+                logging.info(url+'をいいねしました！')
+            else:
+                logging.info('投稿を読み込めませんでした')
+            # like(url)
             clip()
-            time.sleep(random.randint(2, 3)*10)
+    logging.info('プログラムが完了しました')
     driver.close()
 
 
 
 except Exception as e:
+    logging.info('エラーが発生しました')
     error_screen()
     driver.close()
