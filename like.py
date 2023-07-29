@@ -81,8 +81,8 @@ try:
         for url in f:
             driver.get(url)
             logging.info('投稿を読み込んでいます')
-            likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]/div/div/span/svg'
-            elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 2)
+            likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
+            elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
             if(elementLikeButton):
                 elementLikeButton.click()
                 logging.info(url+'をいいねしました！')
