@@ -117,7 +117,7 @@ try:
         for userdata in f:
             name, password = userdata.strip().split(",")
         login(name, password)
-        logging.info('ログインが完了しました')
+        logging.info('「'+name+'」'+'がログインが完了しました')
 
         with open('./url.csv') as f:
             for url in f:
