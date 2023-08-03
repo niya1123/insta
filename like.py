@@ -42,13 +42,13 @@ def clip():
     screenShotFullPath = os.path.join(screenShotFloderPath, screenShotFileName)
     driver.save_screenshot(screenShotFullPath)
 
-def login():
+def login(username, password):
     driver.get('https://www.instagram.com')
     userNameTextBoxName = 'username'
     passTextBoxName = 'password'
     elementUserNameTextBox = waitElement((By.NAME, userNameTextBoxName), 5)
-    elementUserNameTextBox.send_keys('takesiins')
-    driver.find_element_by_name(passTextBoxName).send_keys('Insta#1234')
+    elementUserNameTextBox.send_keys(username)
+    driver.find_element_by_name(passTextBoxName).send_keys(password)
     loginButton = driver.find_element_by_css_selector("button[type=submit]")
     loginButton.click()
     logging.info('ログインしました')
@@ -112,23 +112,27 @@ try:
     driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
     desired_capabilities=DesiredCapabilities.CHROME,
     options=chrome_options)
-    login()
-    logging.info('ログインが完了しました')
 
-    with open('./url.csv') as f:
-        for url in f:
-            logging.info('投稿を読み込んでいます')
-            driver.get(url)
-            likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
-            elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
-            if(elementLikeButton):
-                elementLikeButton.click()
-                logging.info(url+'をいいねしました！')
-            elif(driver.current_url is not url):
-                logging.info('指定されたURLに飛べず、投稿を読み込めませんでした')
-            else:
-                logging.info('投稿を読み込めませんでした')
-            clip()
+    with open('userdata.csv') as f:
+        for userdata in f:
+            name, password = userdata.strip().split(",")
+        login(name, password)
+        logging.info('ログインが完了しました')
+
+        with open('./url.csv') as f:
+            for url in f:
+                logging.info('投稿を読み込んでいます')
+                driver.get(url)
+                likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
+                elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
+                if(elementLikeButton):
+                    elementLikeButton.click()
+                    logging.info(url+'をいいねしました！')
+                elif(driver.current_url is not url):
+                    logging.info('指定されたURLに飛べず、投稿を読み込めませんでした')
+                else:
+                    logging.info('投稿を読み込めませんでした')
+                clip()
     logging.info('プログラムが完了しました')
     driver.close()
 
