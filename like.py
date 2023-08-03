@@ -115,23 +115,23 @@ try:
         logging.info('ただいまログイン中です')
         for userdata in f:
             name, password = userdata.strip().split(",")
-        login(name, password)
-        logging.info('「'+name+'」'+'がログインが完了しました')
+            login(name, password)
+            logging.info('「'+name+'」'+'がログインが完了しました')
 
-        with open('./url.csv') as f:
-            for url in f:
-                logging.info('投稿を読み込んでいます')
-                driver.get(url)
-                likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
-                elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
-                if(elementLikeButton):
-                    elementLikeButton.click()
-                    logging.info(url+'をいいねしました！')
-                elif(driver.current_url is not url):
-                    logging.info('指定されたURLに飛べず、投稿を読み込めませんでした')
-                else:
-                    logging.info('投稿を読み込めませんでした')
-                clip()
+            with open('./url.csv') as f:
+                for url in f:
+                    logging.info('投稿を読み込んでいます')
+                    driver.get(url)
+                    likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
+                    elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
+                    if(elementLikeButton):
+                        elementLikeButton.click()
+                        logging.info(url+'をいいねしました！')
+                    elif(driver.current_url is not url):
+                        logging.info('指定されたURLに飛べず、投稿を読み込めませんでした')
+                    else:
+                        logging.info('投稿を読み込めませんでした')
+                    clip()
     logging.info('プログラムが完了しました')
     driver.close()
 
