@@ -98,13 +98,6 @@ def write_log_to_file():
 
 
 try:
-    write_log_to_file()
-    logging.config.fileConfig('logging.conf')
-    logger = logging.getLogger()
-
-    logging.info('プログラムを実行しました')
-    logging.info('ただいまログイン中です')
-
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument("--headless")
@@ -114,6 +107,12 @@ try:
     options=chrome_options)
 
     with open('userdata.csv') as f:
+        write_log_to_file()
+        logging.config.fileConfig('logging.conf')
+        logger = logging.getLogger()
+
+        logging.info('プログラムを実行しました')
+        logging.info('ただいまログイン中です')
         for userdata in f:
             name, password = userdata.strip().split(",")
         login(name, password)
