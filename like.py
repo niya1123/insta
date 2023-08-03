@@ -107,13 +107,13 @@ try:
     options=chrome_options)
 
     with open('userdata.csv') as f:
-        write_log_to_file()
-        logging.config.fileConfig('logging.conf')
-        logger = logging.getLogger()
-
-        logging.info('プログラムを実行しました')
-        logging.info('ただいまログイン中です')
         for userdata in f:
+            write_log_to_file()
+            logging.config.fileConfig('logging.conf')
+            logger = logging.getLogger()
+
+            logging.info('プログラムを実行しました')
+            logging.info('ただいまログイン中です')
             name, password = userdata.strip().split(",")
             login(name, password)
             logging.info('「'+name+'」'+'がログインが完了しました')
