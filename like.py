@@ -98,16 +98,16 @@ def write_log_to_file():
 
 
 try:
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
-    desired_capabilities=DesiredCapabilities.CHROME,
-    options=chrome_options)
 
     with open('userdata.csv') as f:
         for userdata in f:
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
+            desired_capabilities=DesiredCapabilities.CHROME,
+            options=chrome_options)
             write_log_to_file()
             logging.config.fileConfig('logging.conf')
             logger = logging.getLogger()
@@ -132,8 +132,8 @@ try:
                     else:
                         logging.info('投稿を読み込めませんでした')
                     clip()
-    logging.info('プログラムが完了しました')
-    driver.close()
+                    logging.info('プログラムが完了しました')
+            driver.close()
 
 
 
