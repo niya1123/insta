@@ -94,11 +94,18 @@ def write_log_to_file():
             # ログファイルを削除する
             os.remove(log_file_path)
 
-    
+def isAlreadyPressLike(likeButton):
+	label = likeButton.get_attribute('aria-label')
+	if label == '「いいね！」を取り消す':
+		return True
+	else:
+		return False 
 
 
 try:
-
+    write_log_to_file()
+    logging.config.fileConfig('logging.conf')
+    logger = logging.getLogger()
     with open('userdata.csv') as f:
         for userdata in f:
             chrome_options = webdriver.ChromeOptions()
@@ -108,9 +115,6 @@ try:
             driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub',
             desired_capabilities=DesiredCapabilities.CHROME,
             options=chrome_options)
-            write_log_to_file()
-            logging.config.fileConfig('logging.conf')
-            logger = logging.getLogger()
 
             logging.info('プログラムを実行しました')
             logging.info('ただいまログイン中です')
@@ -124,7 +128,7 @@ try:
                     driver.get(url)
                     likeButtonXpath = '/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]'
                     elementLikeButton = waitElementClickable((By.XPATH,likeButtonXpath) , 5)
-                    if(elementLikeButton):
+                    if(elementLikeButton and not isAlreadyPressLike(elementLikeButton)):
                         elementLikeButton.click()
                         logging.info(url+'をいいねしました！')
                     elif(driver.current_url is not url):
