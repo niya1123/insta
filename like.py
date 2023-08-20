@@ -133,6 +133,8 @@ try:
                         logging.info(url+'をいいねしました！')
                     elif(driver.current_url is not url):
                         logging.info('指定されたURLに飛べず、投稿を読み込めませんでした')
+                    elif(isAlreadyPressLike(elementLikeButton)):
+                         logging.info('すでにいいねされている投稿です')
                     else:
                         logging.info('投稿を読み込めませんでした')
                     clip()
